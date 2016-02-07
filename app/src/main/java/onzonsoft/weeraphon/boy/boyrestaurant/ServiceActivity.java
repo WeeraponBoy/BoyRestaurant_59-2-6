@@ -1,7 +1,10 @@
 package onzonsoft.weeraphon.boy.boyrestaurant;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.DialogPreference;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -16,7 +19,7 @@ public class ServiceActivity extends AppCompatActivity {
     private TextView shownameTextView;
     private Spinner deskSpinner;
     private ListView foodListView;
-    private String officerString,deskString, foodString,amountString;
+    private String officerString,deskString, myfoodString,amountString;
 
 
     @Override
@@ -45,7 +48,7 @@ public class ServiceActivity extends AppCompatActivity {
         Cursor objCursor = objSqLiteDatabase.rawQuery("SELECT * FROM " + MyManage.food_TABLE, null);
 
         int intCount = objCursor.getCount();
-        String[] foodStrings = new String[intCount];
+        final String[] foodStrings = new String[intCount];
         String[] priceStrings = new String[intCount];
         String[] sourceStrings = new String[intCount];
 
@@ -64,7 +67,32 @@ public class ServiceActivity extends AppCompatActivity {
         MyAdapter objMyAdapter = new MyAdapter(ServiceActivity.this,foodStrings,priceStrings,sourceStrings);
         foodListView.setAdapter(objMyAdapter);
 
-    }
+        foodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                comfirmOrder(foodStrings[i]);
+            }
+        });
+
+    }   //foodListView
+
+    private void comfirmOrder(String foodString) {
+
+        myfoodString = foodString;
+        CharSequence[] objCharSequences = {"1 จาน", "2 จาน","3 จาน","4 จาน","5 จาน"};
+        AlertDialog.Builder objBuilder= new AlertDialog.Builder(this);
+        objBuilder.setTitle(foodString);
+        objBuilder.setSingleChoiceItems(objCharSequences, -1, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                amountString = Integer.toString(i + 1);
+                dialogInterface.dismiss();
+            }
+
+        });
+        objBuilder.show();
+
+    }   //confirm order
 
     private void showDesk() {
         final String[] showDeskStrings = {"โต๊ะที่ 1","โต๊ะที่ 2","โต๊ะที่ 3","โต๊ะที่ 4",
