@@ -1,5 +1,6 @@
 package onzonsoft.weeraphon.boy.boyrestaurant;
 
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -64,9 +65,37 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
             //ไม่มีช่องว่าง
+
+            checkAuthen();
         }   //if
 
     }   //Click
+
+    private void checkAuthen() {
+        try {
+
+            String[] resullStrings = objMyManage.searchUser(userString);
+            if (passwordString.equals(resullStrings[2])) {
+
+                //Intent
+                Intent objIntent = new Intent(MainActivity.this, ServiceActivity.class);
+                objIntent.putExtra("Name", resullStrings[3]);
+                startActivity(objIntent);
+                finish();
+
+            } else {
+                Toast.makeText(MainActivity.this,"Password ผิด",Toast.LENGTH_SHORT).show();
+            }
+
+        } catch (Exception e) {
+            Toast.makeText(MainActivity.this,
+                    "ไม่มี" + userString + "ในฐานข้อมูลของเรา",
+                    Toast.LENGTH_SHORT).show();
+
+        }
+
+
+    } //checkAuthen
 
     private void synJSONtoSQLite() {
 
