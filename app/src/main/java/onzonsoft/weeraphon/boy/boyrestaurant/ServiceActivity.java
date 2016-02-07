@@ -1,5 +1,7 @@
 package onzonsoft.weeraphon.boy.boyrestaurant;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -31,8 +33,38 @@ public class ServiceActivity extends AppCompatActivity {
         //Show Desk
         showDesk();
 
+        //Show Food
+        showMenuFood();
+
 
     }//Main Method
+
+    private void showMenuFood() {
+        SQLiteDatabase objSqLiteDatabase = openOrCreateDatabase(MyOpenHelper.database_name,
+                MODE_PRIVATE, null);
+        Cursor objCursor = objSqLiteDatabase.rawQuery("SELECT * FROM " + MyManage.food_TABLE, null);
+
+        int intCount = objCursor.getCount();
+        String[] foodStrings = new String[intCount];
+        String[] priceStrings = new String[intCount];
+        String[] sourceStrings = new String[intCount];
+
+        objCursor.moveToFirst();
+        for (int i = 0; i < intCount; i++) {
+            foodStrings[i] = objCursor.getString(objCursor.getColumnIndex(MyManage.column_food));
+            priceStrings[i] = objCursor.getString(objCursor.getColumnIndex(MyManage.column_price));
+            sourceStrings[i] = objCursor.getString(objCursor.getColumnIndex(MyManage.column_source));
+
+
+            objCursor.moveToNext();
+
+        }
+        objCursor.close();
+
+        MyAdapter objMyAdapter = new MyAdapter(ServiceActivity.this,foodStrings,priceStrings,sourceStrings);
+        foodListView.setAdapter(objMyAdapter);
+
+    }
 
     private void showDesk() {
         final String[] showDeskStrings = {"โต๊ะที่ 1","โต๊ะที่ 2","โต๊ะที่ 3","โต๊ะที่ 4",
