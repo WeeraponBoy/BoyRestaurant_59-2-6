@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.StrictMode;
 import android.preference.DialogPreference;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +14,16 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.util.ArrayList;
 
 public class ServiceActivity extends AppCompatActivity {
 
@@ -87,12 +98,38 @@ public class ServiceActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 amountString = Integer.toString(i + 1);
                 dialogInterface.dismiss();
+                updateOrder();
+
             }
 
         });
         objBuilder.show();
 
     }   //confirm order
+
+    private void updateOrder() {
+        StrictMode.ThreadPolicy MyPolicy = new StrictMode.ThreadPolicy
+                .Builder().permitAll().build();
+        StrictMode.setThreadPolicy(MyPolicy);
+        try {
+            ArrayList<NameValuePair> objNameValuePairs = new ArrayList<NameValuePair>(); //การเอาสติงมาต่อกัน
+            objNameValuePairs.add(new BasicNameValuePair("isAdd","true"));
+            objNameValuePairs.add(new BasicNameValuePair("Officer", officerString));
+            objNameValuePairs.add(new BasicNameValuePair("Desk", deskString));
+            objNameValuePairs.add(new BasicNameValuePair("Food", myfoodString));
+            objNameValuePairs.add(new BasicNameValuePair("Item", amountString));
+
+            HttpClient objHttpClient = new DefaultHttpClient();
+            HttpPost objHttpPost = new HttpPost("http://swiftcodingthai.com/6feb/php_add_data.php");
+            objHttpPost.setEntity(new UrlEncodedFormEntity(objNameValuePairs,"UTF-8"));
+            objHttpClient.execute(objHttpPost);
+
+            Toast.makeText(ServiceActivity.this, "Update Success", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(ServiceActivity.this,"Cannot Update",Toast.LENGTH_SHORT).show();
+
+        }
+    }   //update order
 
     private void showDesk() {
         final String[] showDeskStrings = {"โต๊ะที่ 1","โต๊ะที่ 2","โต๊ะที่ 3","โต๊ะที่ 4",
